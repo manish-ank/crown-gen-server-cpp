@@ -87,8 +87,6 @@ namespace CrownGen
 		Eigen::MatrixXd N;
 		igl::readSTL(stlfile, V, F, N);
 
-		igl::remove_duplicate_vertices(V,F,10e-3,this->Vertices,this->Faces);
-
 		for (int i = 0; i < 3; i++)
 		{
 			std::cout << "Vertex " << i << " " << this->Vertices.row(i) << std::endl;

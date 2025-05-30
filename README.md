@@ -8,13 +8,13 @@ cd build
 cmake ..
 ```
 
-# Building the project
+## Building the project
 ```bash
 cd build
 make
 ```
 
-# Running the project
+## Running the project
 
 ```bash
 ./crown-gen-server-cpp
