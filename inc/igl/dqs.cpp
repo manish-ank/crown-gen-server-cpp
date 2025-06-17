@@ -49,11 +49,8 @@ IGL_INLINE void igl::dqs(
     // Loop over handles
     for(int c = 0;c<W.cols();c++)
     {
-      auto w = W(i,c);
-      if (b0.coeffs().dot(vQ[c].coeffs()) < 0)
-        w = -w;
-      b0.coeffs() += w * vQ[c].coeffs();
-      be.coeffs() += w * vD[c].coeffs();
+      b0.coeffs() += W(i,c) * vQ[c].coeffs();
+      be.coeffs() += W(i,c) * vD[c].coeffs();
     }
     Q ce = be;
     ce.coeffs() /= b0.norm();

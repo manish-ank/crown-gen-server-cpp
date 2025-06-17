@@ -22,7 +22,7 @@ namespace igl
   /// @param[out] N  n by r matrix, where r is the row rank of A
   template <typename DerivedA, typename DerivedN>
   IGL_INLINE void null(
-    const Eigen::MatrixBase<DerivedA> & A,
+    const Eigen::PlainObjectBase<DerivedA> & A,
     Eigen::PlainObjectBase<DerivedN> & N);
 }
 

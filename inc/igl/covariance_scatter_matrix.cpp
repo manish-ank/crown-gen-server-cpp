@@ -14,15 +14,11 @@
 #include "cat.h"
 #include "PI.h"
 
-template <
-  typename DerivedV, 
-  typename DerivedF,
-  typename CSM_type>
 IGL_INLINE void igl::covariance_scatter_matrix(
-  const Eigen::MatrixBase<DerivedV> & V, 
-  const Eigen::MatrixBase<DerivedF> & F,
+  const Eigen::MatrixXd & V, 
+  const Eigen::MatrixXi & F,
   const ARAPEnergyType energy,
-  Eigen::SparseMatrix<CSM_type>& CSM)
+  Eigen::SparseMatrix<double>& CSM)
 {
   using namespace Eigen;
   // number of mesh vertices
@@ -75,9 +71,5 @@ IGL_INLINE void igl::covariance_scatter_matrix(
      dim);
     return;
   }
-}
 
-#ifdef IGL_STATIC_LIBRARY
-// Explicit template instantiation
-template void igl::covariance_scatter_matrix<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, double>(Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1>> const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, -1, 0, -1, -1>> const&, igl::ARAPEnergyType, Eigen::SparseMatrix<double, 0, int>&);
-#endif
+}

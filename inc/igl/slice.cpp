@@ -170,7 +170,6 @@ IGL_INLINE DerivedX igl::slice(
     const Eigen::DenseBase<DerivedX> &X,
     const Eigen::DenseBase<DerivedR> &R)
 {
-  // This is not safe. See PlainMatrix
   DerivedX Y;
   igl::slice(X, R, Y);
   return Y;
@@ -182,7 +181,6 @@ IGL_INLINE DerivedX igl::slice(
     const Eigen::DenseBase<DerivedR> &R,
     const int dim)
 {
-  // This is not safe. See PlainMatrix
   DerivedX Y;
   igl::slice(X, R, dim, Y);
   return Y;

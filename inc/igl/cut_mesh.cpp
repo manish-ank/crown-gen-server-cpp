@@ -26,23 +26,15 @@ IGL_INLINE void igl::cut_mesh(
   cut_mesh(Vn,Fn,C,_I);
 }
 
-template <
-  typename DerivedV, 
-  typename DerivedF, 
-  typename DerivedC, 
-  typename DerivedVn,
-  typename DerivedFn,
-  typename DerivedI>
+template <typename DerivedV, typename DerivedF, typename DerivedC, typename DerivedI>
 IGL_INLINE void igl::cut_mesh(
   const Eigen::MatrixBase<DerivedV>& V,
   const Eigen::MatrixBase<DerivedF>& F,
   const Eigen::MatrixBase<DerivedC>& C,
-  Eigen::PlainObjectBase<DerivedVn>& Vn,
-  Eigen::PlainObjectBase<DerivedFn>& Fn,
+  Eigen::PlainObjectBase<DerivedV>& Vn,
+  Eigen::PlainObjectBase<DerivedF>& Fn,
   Eigen::PlainObjectBase<DerivedI>& I
 ){
-  static_assert(std::is_same<typename DerivedV::Scalar, typename DerivedVn::Scalar>::value, "Scalar types of V and Vn must match");
-  static_assert(std::is_same<typename DerivedF::Scalar, typename DerivedFn::Scalar>::value, "Scalar types of F and Fn must match");
   Vn = V;
   Fn = F;
   cut_mesh(Vn,Fn,C,I);
@@ -83,14 +75,9 @@ IGL_INLINE void igl::cut_mesh(
     for(Index k=0;k<3;k++){
       Index u = F(i,k);
       Index v = F(i,(k+1)%3);
-      if(FF(i,k) == -1){ 
-        // add one extra occurance for boundary vertices
+      if(FF(i,k) == -1){ // add one extra occurance for boundary vertices
         eventual(u) += 1;
-      }else if( 
-          (u < v) && 
-          (C(i,k) || C(FF(i,k),FFi(i,k))) )
-      { 
-        // only compute every (undirected) edge ones
+      }else if(C(i,k) == 1 && u < v){ // only compute every (undirected) edge ones
         eventual(u) += 1;
         eventual(v) += 1;
       }

@@ -149,7 +149,7 @@ IGL_INLINE void igl::embree::EmbreeIntersector::deinit()
 IGL_INLINE bool igl::embree::EmbreeIntersector::intersectRay(
   const Eigen::RowVector3f& origin,
   const Eigen::RowVector3f& direction,
-  Hit<float> & hit,
+  Hit& hit,
   float tnear,
   float tfar,
   int mask) const
@@ -160,7 +160,9 @@ IGL_INLINE bool igl::embree::EmbreeIntersector::intersectRay(
 
   // shot ray
   {
-    rtcIntersect1(scene,&ray);
+    RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+    rtcIntersect1(scene,&context,&ray);
     ray.hit.Ng_x = -ray.hit.Ng_x; // EMBREE_FIXME: only correct for triangles,quads, and subdivision surfaces
     ray.hit.Ng_y = -ray.hit.Ng_y;
     ray.hit.Ng_z = -ray.hit.Ng_z;
@@ -186,7 +188,7 @@ IGL_INLINE bool igl::embree::EmbreeIntersector::intersectRay(
 IGL_INLINE bool igl::embree::EmbreeIntersector::intersectBeam(
       const Eigen::RowVector3f& origin,
       const Eigen::RowVector3f& direction,
-      Hit<float> & hit,
+      Hit& hit,
       float tnear,
       float tfar,
       int mask,
@@ -195,7 +197,7 @@ IGL_INLINE bool igl::embree::EmbreeIntersector::intersectBeam(
 	  unsigned int samples) const
 {
   bool hasHit = false;
-  Hit<float> bestHit;
+  Hit bestHit;
 
   if(closestHit)
     bestHit.t = std::numeric_limits<float>::max();
@@ -239,7 +241,7 @@ igl::embree::EmbreeIntersector
 ::intersectRay(
   const Eigen::RowVector3f& origin,
   const Eigen::RowVector3f& direction,
-  std::vector<Hit<float> > &hits,
+  std::vector<Hit > &hits,
   int& num_rays,
   float tnear,
   float tfar,
@@ -269,7 +271,9 @@ igl::embree::EmbreeIntersector
     ray.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
     num_rays++;
     {
-      rtcIntersect1(scene,&ray);
+      RTCIntersectContext context;
+      rtcInitIntersectContext(&context);
+      rtcIntersect1(scene,&context,&ray);
       ray.hit.Ng_x = -ray.hit.Ng_x; // EMBREE_FIXME: only correct for triangles,quads, and subdivision surfaces
       ray.hit.Ng_y = -ray.hit.Ng_y;
       ray.hit.Ng_z = -ray.hit.Ng_z;
@@ -291,7 +295,7 @@ igl::embree::EmbreeIntersector
       }
       else
       {
-        Hit<float> hit;
+        Hit hit;
         hit.id = ray.hit.primID;
         hit.gid = ray.hit.geomID;
         hit.u = ray.hit.u;
@@ -317,7 +321,7 @@ igl::embree::EmbreeIntersector
     {
       std::cout<<"Warning: Large number of hits..."<<endl;
       std::cout<<"[ ";
-      for(vector<Hit<float>>::iterator hit = hits.begin(); hit != hits.end();hit++)
+      for(vector<Hit>::iterator hit = hits.begin(); hit != hits.end();hit++)
       {
         std::cout<<(hit->id+1)<<" ";
       }
@@ -325,7 +329,7 @@ igl::embree::EmbreeIntersector
       std::cout.precision(std::numeric_limits< double >::digits10);
       std::cout<<"[ ";
 
-      for(vector<Hit<float>>::iterator hit = hits.begin(); hit != hits.end(); hit++)
+      for(vector<Hit>::iterator hit = hits.begin(); hit != hits.end(); hit++)
       {
         std::cout<<(hit->t)<<endl;;
       }
@@ -342,14 +346,16 @@ igl::embree::EmbreeIntersector
 
 IGL_INLINE bool
 igl::embree::EmbreeIntersector
-::intersectSegment(const Eigen::RowVector3f& a, const Eigen::RowVector3f& ab, Hit<float> &hit, int mask) const
+::intersectSegment(const Eigen::RowVector3f& a, const Eigen::RowVector3f& ab, Hit &hit, int mask) const
 {
   RTCRayHit ray; // EMBREE_FIXME: use RTCRay for occlusion rays
   ray.ray.flags = 0;
   createRay(ray,a,ab,0,1.0,mask);
 
   {
-    rtcIntersect1(scene,&ray);
+    RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+    rtcIntersect1(scene,&context,&ray);
     ray.hit.Ng_x = -ray.hit.Ng_x; // EMBREE_FIXME: only correct for triangles,quads, and subdivision surfaces
     ray.hit.Ng_y = -ray.hit.Ng_y;
     ray.hit.Ng_z = -ray.hit.Ng_z;

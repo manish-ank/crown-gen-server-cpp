@@ -13,7 +13,6 @@
 #include "face_areas.h"
 #include "volume.h"
 #include "dihedral_angles.h"
-#include "dihedral_angles_intrinsic.h"
 
 #include "verbose.h"
 

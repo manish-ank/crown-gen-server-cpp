@@ -9,20 +9,18 @@
 #include "doublearea.h"
 #include "random_points_on_mesh.h"
 #include "sortrows.h"
-#include "placeholders.h"
 #include "PI.h"
 #include "get_seconds.h"
 #include <unordered_map>
 #include <algorithm>
 #include <vector>
 #include <random>
-#include <cstdint>
 
 namespace igl
 {
   // It is very important that we use 64bit keys to avoid out of bounds (easy to
   // get to happen with dense samplings (e.g., r = 0.0005*bbd)
-  typedef std::int64_t BlueNoiseKeyType;
+  typedef int64_t BlueNoiseKeyType;
 }
 
 // Helper functions
@@ -291,10 +289,10 @@ IGL_INLINE void igl::blue_noise(
   {
     Eigen::VectorXi I;
     igl::sortrows(decltype(Xs)(Xs),true,Xs,I);
-    X = X(I,igl::placeholders::all).eval();
+    X = X(I,Eigen::all).eval();
     // These two could be spun off in their own thread.
-    XB = XB(I,igl::placeholders::all).eval();
-    XFI = XFI(I,igl::placeholders::all).eval();
+    XB = XB(I,Eigen::all).eval();
+    XFI = XFI(I,Eigen::all).eval();
   }
   // Initialization
   std::unordered_map<BlueNoiseKeyType,std::vector<int> > M;

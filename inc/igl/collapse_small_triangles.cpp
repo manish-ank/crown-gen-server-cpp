@@ -17,15 +17,11 @@
 
 #include <iostream>
 
-template <
-  typename DerivedV,
-  typename DerivedF,
-  typename DerivedFF>
 void igl::collapse_small_triangles(
-  const Eigen::MatrixBase<DerivedV> & V,
-  const Eigen::MatrixBase<DerivedF> & F,
+  const Eigen::MatrixXd & V,
+  const Eigen::MatrixXi & F,
   const double eps,
-  Eigen::PlainObjectBase<DerivedFF> & FF)
+  Eigen::MatrixXi & FF)
 {
   using namespace Eigen;
   using namespace std;
@@ -145,8 +141,3 @@ void igl::collapse_small_triangles(
   MatrixXi recFF = FF;
   return collapse_small_triangles(V,recFF,eps,FF);
 }
-
-#ifdef IGL_STATIC_LIBRARY
-// Explicit template instantiation
-template void igl::collapse_small_triangles<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXi> ( const Eigen::MatrixBase<Eigen::MatrixXd> &, const Eigen::MatrixBase<Eigen::MatrixXi> &, const double , Eigen::PlainObjectBase<Eigen::MatrixXi> & );
-#endif

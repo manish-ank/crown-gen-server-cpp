@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(crown-gen-server-cpp CXX)
+project(mesh-server CXX)
 
 include(CheckIncludeFileCXX)
 
@@ -19,13 +19,22 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(FetchContent)
-FetchContent_Declare(
-    Eigen
-    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-    GIT_TAG 3.4.0 
-)
-FetchContent_MakeAvailable(Eigen)
+# include(FetchContent)
+# FetchContent_Declare(
+#     Eigen
+#     GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+#     GIT_TAG 3.4.0 
+# )
+# FetchContent_MakeAvailable(Eigen)
+
+# include(FetchContent)
+# FetchContent_Declare(
+#     yaml-cpp
+#     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
+#     GIT_TAG 0.8.0
+# )
+# FetchContent_MakeAvailable(yaml-cpp)
+
 
 add_executable(${PROJECT_NAME} main.cc)
 
@@ -37,6 +46,7 @@ add_executable(${PROJECT_NAME} main.cc)
 #
 # and comment out the following lines
 find_package(Drogon CONFIG REQUIRED)
+find_package(Eigen3 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon Eigen3::Eigen)
 
 # ##############################################################################
@@ -71,7 +81,8 @@ drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
 target_include_directories(${PROJECT_NAME}
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                    ${CMAKE_CURRENT_SOURCE_DIR}/models
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/inc
+                                   )
 target_sources(${PROJECT_NAME}
                PRIVATE
                ${SRC_DIR}

@@ -9,7 +9,6 @@
 
 #include "lexicographic_triangulation.h"
 #include "sortrows.h"
-#include "PlainMatrix.h"
 
 #include <vector>
 #include <list>
@@ -31,7 +30,7 @@ IGL_INLINE void igl::lexicographic_triangulation(
   }
 
   // Sort points in lexicographic order.
-  PlainMatrix<DerivedP> ordered_P;
+  DerivedP ordered_P;
   Eigen::VectorXi order;
   igl::sortrows(P, true, ordered_P, order);
 

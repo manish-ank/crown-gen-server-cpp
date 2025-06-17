@@ -18,10 +18,11 @@ namespace igl
   /// @param[in] F  #F by simplex_size list of "faces"
   /// @param[out] E  #E by simplex_size-1  list of exterior edges
   ///
-  template <typename DerivedF, typename DerivedE>
   IGL_INLINE void exterior_edges(
-    const Eigen::MatrixBase<DerivedF> & F,
-    Eigen::PlainObjectBase<DerivedE> & E);
+    const Eigen::MatrixXi & F,
+    Eigen::MatrixXi & E);
+  /// \overload
+  IGL_INLINE Eigen::MatrixXi exterior_edges(const Eigen::MatrixXi & F);
 }
 #ifndef IGL_STATIC_LIBRARY
 #  include "exterior_edges.cpp"

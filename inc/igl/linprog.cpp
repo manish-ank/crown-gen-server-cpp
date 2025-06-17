@@ -8,7 +8,6 @@
 #include "linprog.h"
 #include "find.h"
 #include "colon.h"
-#include "placeholders.h"
 
 //#define IGL_LINPROG_VERBOSE
 IGL_INLINE bool igl::linprog(
@@ -77,7 +76,7 @@ IGL_INLINE bool igl::linprog(
     J.head(j) = B.head(j);
     J.tail(B.size()-j-1) = B.tail(B.size()-j-1);
     B(j) = n+m;
-    MatrixXd AJ = A(igl::placeholders::all,J);
+    MatrixXd AJ = A(Eigen::all,J);
     const VectorXd a = b - AJ.rowwise().sum();
     {
       MatrixXd old_A = A;
@@ -124,7 +123,7 @@ IGL_INLINE bool igl::linprog(
       }
       // reduced costs
       VectorXd sN = s(N);
-      MatrixXd AN = A(igl::placeholders::all,N);
+      MatrixXd AN = A(Eigen::all,N);
       VectorXd r = sN - AN.transpose() * yb;
       int q;
       // determine new basic variable
@@ -210,7 +209,7 @@ IGL_INLINE bool igl::linprog(
       }
     }
     // iterative refinement
-    xb = (xb+D*(b-A(igl::placeholders::all,B)*xb)).eval();
+    xb = (xb+D*(b-A(Eigen::all,B)*xb)).eval();
     // must be due to rounding
     VectorXi I;
     igl::find((xb.array()<0).eval(),I);

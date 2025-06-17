@@ -25,15 +25,11 @@ IGL_INLINE void igl::embree::ambient_occlusion(
     const Eigen::Vector3f& s,
     const Eigen::Vector3f& dir)->bool
   {
-    igl::Hit<float> hit;
+    igl::Hit hit;
     const float tnear = 1e-4f;
     return ei.intersectRay(s,dir,hit,tnear);
   };
-  const auto Pf = P.template cast<float>().eval();
-  const auto Nf = N.template cast<float>().eval();
-  Eigen::Matrix<float,Eigen::Dynamic,1> Sf;
-  igl::ambient_occlusion(shoot_ray,Pf,Nf,num_samples,Sf);
-  S = Sf.template cast<typename DerivedS::Scalar>();
+  return igl::ambient_occlusion(shoot_ray,P,N,num_samples,S);
 }
 
 template <

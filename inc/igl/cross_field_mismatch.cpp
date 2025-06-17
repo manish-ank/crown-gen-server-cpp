@@ -18,7 +18,6 @@
 #include "triangle_triangle_adjacency.h"
 #include "rotation_matrix_from_directions.h"
 #include "PI.h"
-#include "PlainMatrix.h"
 
 namespace igl {
   template <typename DerivedV, typename DerivedF, typename DerivedM>
@@ -31,7 +30,7 @@ namespace igl {
     const Eigen::MatrixBase<DerivedV> &PD1;
     const Eigen::MatrixBase<DerivedV> &PD2;
     
-    PlainMatrix<DerivedV> N;
+    DerivedV N;
 
   private:
     // internal
@@ -39,8 +38,8 @@ namespace igl {
     std::vector<std::vector<int> > VF;
     std::vector<std::vector<int> > VFi;
     
-    PlainMatrix<DerivedF> TT;
-    PlainMatrix<DerivedF> TTi;
+    DerivedF TT;
+    DerivedF TTi;
 
 
   private:

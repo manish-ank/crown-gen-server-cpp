@@ -10,7 +10,6 @@
 #include "../doublearea.h"
 #include "../random_dir.h"
 #include "../bfs_orient.h"
-#include "../PlainMatrix.h"
 #include "EmbreeIntersector.h"
 #include <iostream>
 #include <random>
@@ -23,8 +22,8 @@ template <
   typename DerivedI,
   typename DerivedC>
 IGL_INLINE void igl::embree::reorient_facets_raycast(
-  const Eigen::MatrixBase<DerivedV> & V,
-  const Eigen::MatrixBase<DerivedF> & F,
+  const Eigen::PlainObjectBase<DerivedV> & V,
+  const Eigen::PlainObjectBase<DerivedF> & F,
   int rays_total,
   int rays_minimum,
   bool facet_wise,
@@ -41,16 +40,14 @@ IGL_INLINE void igl::embree::reorient_facets_raycast(
   // number of faces
   const int m = F.rows();
 
-  Eigen::MatrixXi Fi = F.template cast<int>();
-  Eigen::MatrixXi FF;
+  MatrixXi FF = F;
   if (facet_wise) {
-    FF = Fi;
     C.resize(m);
     for (int i = 0; i < m; ++i) C(i) = i;
 
   } else {
     if (is_verbose) cout << "extracting patches... ";
-    bfs_orient(Fi,FF,C);
+    bfs_orient(F,FF,C);
   }
   if (is_verbose) cout << (C.maxCoeff() + 1)  << " components. ";
 
@@ -166,8 +163,8 @@ IGL_INLINE void igl::embree::reorient_facets_raycast(
     int c = C(f);
 
     // shoot ray toward front & back
-    vector<Hit<float>> hits_front;
-    vector<Hit<float>> hits_back;
+    vector<Hit> hits_front;
+    vector<Hit> hits_back;
     int num_rays_front;
     int num_rays_back;
     ei.intersectRay(o,  d, hits_front, num_rays_front);
@@ -215,7 +212,7 @@ IGL_INLINE void igl::embree::reorient_facets_raycast(
               ? 1 : 0;
     }
     // To account for the effect of bfs_orient
-    if (Fi.row(f) != FF.row(f))
+    if (F.row(f) != FF.row(f))
       I(f) = 1 - I(f);
   }
   if (is_verbose) cout << "done!" << endl;
@@ -227,8 +224,8 @@ template <
   typename DerivedFF,
   typename DerivedI>
 IGL_INLINE void igl::embree::reorient_facets_raycast(
-  const Eigen::MatrixBase<DerivedV> & V,
-  const Eigen::MatrixBase<DerivedF> & F,
+  const Eigen::PlainObjectBase<DerivedV> & V,
+  const Eigen::PlainObjectBase<DerivedF> & F,
   Eigen::PlainObjectBase<DerivedFF> & FF,
   Eigen::PlainObjectBase<DerivedI> & I)
 {
@@ -237,7 +234,7 @@ IGL_INLINE void igl::embree::reorient_facets_raycast(
   const bool facet_wise = false;
   const bool use_parity = false;
   const bool is_verbose = false;
-  Eigen::Vector<typename DerivedI::Scalar,Eigen::Dynamic> C;
+  Eigen::VectorXi C;
   reorient_facets_raycast(
     V,F,rays_total,rays_minimum,facet_wise,use_parity,is_verbose,I,C);
   // Conservative in case FF = F
@@ -256,7 +253,7 @@ IGL_INLINE void igl::embree::reorient_facets_raycast(
 
 #ifdef IGL_STATIC_LIBRARY
 // Explicit template instantiation
-template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
-template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<bool, -1, 1, 0, -1, 1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, int, int, bool, bool, bool, Eigen::PlainObjectBase<Eigen::Matrix<bool, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
-template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, 1, 0, -1, 1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, int, int, bool, bool, bool, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
+template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
+template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<bool, -1, 1, 0, -1, 1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, int, int, bool, bool, bool, Eigen::PlainObjectBase<Eigen::Matrix<bool, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
+template void igl::embree::reorient_facets_raycast<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, 1, 0, -1, 1>, Eigen::Matrix<int, -1, 1, 0, -1, 1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, int, int, bool, bool, bool, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, 1, 0, -1, 1> >&);
 #endif

@@ -9,7 +9,6 @@
 #include "edge_lengths.h"
 #include "intrinsic_delaunay_triangulation.h"
 #include "cotmatrix_intrinsic.h"
-#include "PlainMatrix.h"
 #include <cassert>
 
 template <typename DerivedV, typename DerivedF, typename Scalar>
@@ -19,7 +18,7 @@ IGL_INLINE void igl::intrinsic_delaunay_cotmatrix(
   Eigen::SparseMatrix<Scalar>& L)
 {
   Eigen::Matrix<Scalar, Eigen::Dynamic, 3> l_intrinsic;
-  PlainMatrix<DerivedF> F_intrinsic;
+  DerivedF F_intrinsic;
   return igl::intrinsic_delaunay_cotmatrix(V,F,L,l_intrinsic,F_intrinsic);
 }
 

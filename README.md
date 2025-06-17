@@ -1,4 +1,4 @@
-# crown-gen-server-cpp
+# mesh-server
 
 ## Initial configuration of the Project
 
@@ -17,5 +17,5 @@ make
 ## Running the project
 
 ```bash
-./crown-gen-server-cpp
+./mesh-server
 ```

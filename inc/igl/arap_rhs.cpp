@@ -49,7 +49,7 @@ IGL_INLINE void igl::arap_rhs(
       return;
   }
 
-  Eigen::SparseMatrix<typename DerivedK::Scalar> KX,KY,KZ;
+  DerivedK KX,KY,KZ;
   arap_linear_block(V,F,0,energy,KX);
   arap_linear_block(V,F,1,energy,KY);
   if(Vdim == 2)
@@ -63,7 +63,7 @@ IGL_INLINE void igl::arap_rhs(
       K = cat(2,cat(2,repdiag(KX,dim),repdiag(KY,dim)),repdiag(KZ,dim));
     }else if(dim ==2)
     {
-      Eigen::SparseMatrix<typename DerivedK::Scalar> ZZ(KX.rows()*2,KX.cols());
+      DerivedK ZZ(KX.rows()*2,KX.cols());
       K = cat(2,cat(2,
             cat(2,repdiag(KX,dim),ZZ),
             cat(2,repdiag(KY,dim),ZZ)),

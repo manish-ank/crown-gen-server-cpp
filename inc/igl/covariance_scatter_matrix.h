@@ -26,15 +26,11 @@ namespace igl
   ///     elements, can be used to speed up covariance matrix computation
   ///
   /// \see arap_linear_block, arap, ARAPEnergyType
-  template <
-    typename DerivedV, 
-    typename DerivedF,
-    typename CSM_type>
   IGL_INLINE void covariance_scatter_matrix(
-    const Eigen::MatrixBase<DerivedV> & V, 
-    const Eigen::MatrixBase<DerivedF> & F,
+    const Eigen::MatrixXd & V, 
+    const Eigen::MatrixXi & F,
     const ARAPEnergyType energy,
-    Eigen::SparseMatrix<CSM_type>& CSM);
+    Eigen::SparseMatrix<double>& CSM);
 }
 
 #ifndef IGL_STATIC_LIBRARY

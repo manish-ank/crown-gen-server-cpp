@@ -9,11 +9,11 @@
 #     # [Options, -SessionTicket],
 #     # [Options, Compression]
 #   ]
-# listeners:
+listeners:
 #     # address: Ip address,0.0.0.0 by default
-#   - address: 0.0.0.0
+  - address: 0.0.0.0
 #     # port: Port number
-#     port: 80
+    port: 7812  
 #     # https: If true, use https for security,false by default
 #     https: false
 #   - address: 0.0.0.0

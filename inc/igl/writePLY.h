@@ -102,7 +102,7 @@ namespace igl
     const std::string & filename,
     const Eigen::MatrixBase<DerivedV> & V,
     const Eigen::MatrixBase<DerivedF> & F,
-    const Eigen::MatrixBase<DerivedE> & E
+    const Eigen::MatrixBase<DerivedF> & E
      );
   /// \overload
   template <

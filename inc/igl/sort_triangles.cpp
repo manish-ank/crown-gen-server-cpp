@@ -11,7 +11,6 @@
 #include "sortrows.h"
 #include "slice.h"
 #include "round.h"
-#include "placeholders.h"
 #include "colon.h"
 
 #include <iostream>
@@ -47,7 +46,7 @@ IGL_INLINE void igl::sort_triangles(
       MV.template cast<Scalar>().transpose()*
        P.template cast<Scalar>().transpose().eval().col(2));
   sort(D,1,false,sD,I);
-  FF = F(I.derived(),igl::placeholders::all);
+  FF = F(I.derived(),Eigen::all);
 }
 
 

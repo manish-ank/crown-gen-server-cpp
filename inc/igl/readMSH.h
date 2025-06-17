@@ -37,28 +37,19 @@ namespace igl
     /// \bug only 3D information is supported
     /// \bug only the 1st tag per element is returned (physical) 
     /// \bug same element fields are expected to be associated with surface elements and volumetric elements
-    template <
-      typename DerivedX,
-      typename DerivedTri,
-      typename DerivedTet,
-      typename DerivedTriTag,
-      typename DerivedTetTag,
-      typename MatrixXF,
-      typename MatrixTriF,
-      typename MatrixTetF
-      >
+    template <int EigenMatrixOptions>
     IGL_INLINE bool readMSH(
       const std::string &msh,
-      Eigen::PlainObjectBase<DerivedX> &X,
-      Eigen::PlainObjectBase<DerivedTri> &Tri,
-      Eigen::PlainObjectBase<DerivedTet> &Tet,
-      Eigen::PlainObjectBase<DerivedTriTag> &TriTag,
-      Eigen::PlainObjectBase<DerivedTetTag> &TetTag,
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions> &X,
+      Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions> &Tri,
+      Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions> &Tet,
+      Eigen::VectorXi &TriTag,
+      Eigen::VectorXi &TetTag,
       std::vector<std::string>     &XFields,
-      std::vector<MatrixXF> &XF,
+      std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions>> &XF,
       std::vector<std::string>     &EFields,
-      std::vector<MatrixTriF> &TriF,
-      std::vector<MatrixTetF> &TetF);
+      std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions>> &TriF,
+      std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,EigenMatrixOptions>> &TetF);
     /// \overload
     template <int EigenMatrixOptions>
     IGL_INLINE bool readMSH(

@@ -28,13 +28,12 @@ namespace igl
   /// @return list of faces touched by circulation (in cyclically order).
   ///   
   /// \see edge_flaps
-  template <typename DerivedEMAP, typename DerivedEF, typename DerivedEI>
   IGL_INLINE std::vector<int> circulation(
     const int e,
     const bool ccw,
-    const Eigen::MatrixBase<DerivedEMAP> & EMAP,
-    const Eigen::MatrixBase<DerivedEF> & EF,
-    const Eigen::MatrixBase<DerivedEI> & EI);
+    const Eigen::VectorXi & EMAP,
+    const Eigen::MatrixXi & EF,
+    const Eigen::MatrixXi & EI);
   /// Return list of faces around the end point of an edge. Assumes
   /// data-structures are built from an edge-manifold **closed** mesh.
   ///
@@ -50,14 +49,13 @@ namespace igl
   /// @param[out] #vN list of of faces touched by circulation (in cyclically order).
   ///   
   /// \see edge_flaps
-  template <typename DerivedEMAP, typename DerivedEF, typename DerivedEI, typename DerivedvN>
   IGL_INLINE void circulation(
     const int e,
     const bool ccw,
-    const Eigen::MatrixBase<DerivedEMAP> & EMAP,
-    const Eigen::MatrixBase<DerivedEF> & EF,
-    const Eigen::MatrixBase<DerivedEI> & EI,
-    Eigen::PlainObjectBase<DerivedvN> & vN);
+    const Eigen::VectorXi & EMAP,
+    const Eigen::MatrixXi & EF,
+    const Eigen::MatrixXi & EI,
+    Eigen::VectorXi & vN);
   /// Return list of faces around the end point of an edge. Assumes
   /// data-structures are built from an edge-manifold **closed** mesh.
   ///
@@ -74,17 +72,16 @@ namespace igl
   ///  @param[out] Nf  #Nf list of face indices
   ///   
   /// \see edge_flaps
-  template <typename DerivedF, typename DerivedEMAP, typename DerivedEF, typename DerivedEI, typename Nv_type>
   IGL_INLINE void circulation(
     const int e,
     const bool ccw,
-    const Eigen::MatrixBase<DerivedF> & F,
-    const Eigen::MatrixBase<DerivedEMAP> & EMAP,
-    const Eigen::MatrixBase<DerivedEF> & EF,
-    const Eigen::MatrixBase<DerivedEI> & EI,
+    const Eigen::MatrixXi & F,
+    const Eigen::VectorXi & EMAP,
+    const Eigen::MatrixXi & EF,
+    const Eigen::MatrixXi & EI,
     /*std::vector<int> & Ne,*/
-    std::vector<Nv_type> & Nv,
-    std::vector<Nv_type> & Nf);
+    std::vector<int> & Nv,
+    std::vector<int> & Nf);
 }
 
 #ifndef IGL_STATIC_LIBRARY

@@ -9,7 +9,6 @@
 #include "AABB.h"
 #include "per_face_normals.h"
 #include "random_points_on_mesh.h"
-#include "placeholders.h"
 #include "rigid_alignment.h"
 #include <cassert>
 #include <iostream>
@@ -97,7 +96,7 @@ IGL_INLINE void igl::iterative_closest_point(
       Ytree.squared_distance(VY,FY,X,sqrD,I,P);
     }
     // Use better normals?
-    MatrixXS N = NY(I,igl::placeholders::all);
+    MatrixXS N = NY(I,Eigen::all);
     //MatrixXS N = (X - P).rowwise().normalized();
     // fit rotation,translation
     Matrix3S Rup;

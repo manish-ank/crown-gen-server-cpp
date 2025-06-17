@@ -24,15 +24,11 @@ namespace igl
   /// @param[out] FF  #FF by 3 list of triangle indices into V
   ///
   ///
-  template <
-    typename DerivedV,
-    typename DerivedF,
-    typename DerivedFF>
   void collapse_small_triangles(
-    const Eigen::MatrixBase<DerivedV> & V,
-    const Eigen::MatrixBase<DerivedF> & F,
+    const Eigen::MatrixXd & V,
+    const Eigen::MatrixXi & F,
     const double eps,
-    Eigen::PlainObjectBase<DerivedFF> & FF);
+    Eigen::MatrixXi & FF);
 }
 
 #ifndef IGL_STATIC_LIBRARY

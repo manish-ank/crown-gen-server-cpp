@@ -1,7 +1,6 @@
 #include "screen_space_selection.h"
 
 #include "AABB.h"
-#include "PlainMatrix.h"
 #include "winding_number.h"
 #include "project.h"
 #include "unproject.h"
@@ -36,7 +35,7 @@ IGL_INLINE void igl::screen_space_selection(
   {
     // Skip unselected points
     if(W(i)<0.5){ return; }
-    igl::Hit<typename DerivedV::Scalar> hit;
+    igl::Hit hit;
     tree.intersect_ray(V,F,origin,V.row(i)-origin,hit);
     and_visible(i) = !(hit.t>1e-5 && hit.t<(1-1e-5));
   });
@@ -87,7 +86,7 @@ IGL_INLINE void igl::screen_space_selection(
   Eigen::PlainObjectBase<DerivedW> & W)
 {
   // project all mesh vertices to 2D
-  PlainMatrix<DerivedV,Eigen::Dynamic,Eigen::Dynamic> V2;
+  DerivedV V2;
   igl::project(V,model,proj,viewport,V2);
   // In 2D this uses O(N*M) naive algorithm.
   igl::winding_number(P,E,V2,W);

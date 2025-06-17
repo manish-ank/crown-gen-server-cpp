@@ -24,7 +24,7 @@ IGL_INLINE bool igl::embree::unproject_onto_mesh(
   const auto & shoot_ray = [&ei](
     const Eigen::Vector3f& s,
     const Eigen::Vector3f& dir,
-    igl::Hit<float>  & hit)->bool
+    igl::Hit & hit)->bool
   {
     return ei.intersectRay(s,dir,hit);
   };

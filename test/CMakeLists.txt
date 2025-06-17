@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(crown-gen-server-cpp_test CXX)
+project(mesh-server_test CXX)
 
 add_executable(${PROJECT_NAME} test_main.cc)
 

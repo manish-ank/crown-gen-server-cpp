@@ -13,24 +13,21 @@
 #ifndef IGL_WINDINGNUMBERAABB_H
 #define IGL_WINDINGNUMBERAABB_H
 #include "WindingNumberTree.h"
-#include "PlainMatrix.h"
 
 namespace igl
 {
   /// Class for building an AABB tree to implement the divide and conquer
   /// algorithm described in [Jacobson et al. 2013]. 
   template <
-    typename Scalar, 
-    typename Index>
-  class WindingNumberAABB : public WindingNumberTree<Scalar,Index>
+    typename Point,
+    typename DerivedV, 
+    typename DerivedF >
+  class WindingNumberAABB : public WindingNumberTree<Point,DerivedV,DerivedF>
   {
     protected:
-      // WindingNumberTree defines Point
-      using Point = typename WindingNumberTree<Scalar,Index>::Point;
-      using MatrixXF = typename WindingNumberTree<Scalar,Index>::MatrixXF;
       Point min_corner;
       Point max_corner;
-      Scalar total_positive_area;
+      typename DerivedV::Scalar total_positive_area;
     public: 
       enum SplitMethod
       {
@@ -40,25 +37,23 @@ namespace igl
       } split_method;
     public:
       inline WindingNumberAABB():
-        total_positive_area(std::numeric_limits<Scalar>::infinity()),
+        total_positive_area(std::numeric_limits<typename DerivedV::Scalar>::infinity()),
         split_method(MEDIAN_ON_LONGEST_AXIS)
       {}
       /// Constructor
       ///
       /// @param[in] V  #V by 3 list of vertex positions
       /// @param[in] F  #F by 3 list of triangle indices into V
-      template <typename DerivedV, typename DerivedF>
       inline WindingNumberAABB(
         const Eigen::MatrixBase<DerivedV> & V,
         const Eigen::MatrixBase<DerivedF> & F);
       inline WindingNumberAABB(
-        const WindingNumberTree<Scalar,Index> & parent,
-        const typename WindingNumberTree<Scalar,Index>::MatrixXF & F);
+        const WindingNumberTree<Point,DerivedV,DerivedF> & parent,
+        const Eigen::MatrixBase<DerivedF> & F);
       /// Initialize the hierarchy to a given mesh
       ///
       /// @param[in] V  #V by 3 list of vertex positions
       /// @param[in] F  #F by 3 list of triangle indices into V
-      template <typename DerivedV, typename DerivedF>
       inline void set_mesh(
         const Eigen::MatrixBase<DerivedV> & V,
         const Eigen::MatrixBase<DerivedF> & F);
@@ -67,8 +62,8 @@ namespace igl
       inline virtual void grow();
       // Compute min and max corners
       inline void compute_min_max_corners();
-      inline Scalar max_abs_winding_number(const Point & p) const;
-      inline Scalar max_simple_abs_winding_number(const Point & p) const;
+      inline typename DerivedV::Scalar max_abs_winding_number(const Point & p) const;
+      inline typename DerivedV::Scalar max_simple_abs_winding_number(const Point & p) const;
   };
 }
 
@@ -91,76 +86,70 @@ namespace igl
 #  define WindingNumberAABB_MIN_F 100
 #endif
 
-template <typename Scalar, typename Index>
-  template <typename DerivedV, typename DerivedF>
-inline void igl::WindingNumberAABB<Scalar,Index>::set_mesh(
+template <typename Point, typename DerivedV, typename DerivedF>
+inline void igl::WindingNumberAABB<Point,DerivedV,DerivedF>::set_mesh(
     const Eigen::MatrixBase<DerivedV> & V,
     const Eigen::MatrixBase<DerivedF> & F)
 {
-  // static assert that DerivedF::ColsAtCompileTime == 3 or Eigen::Dynamic
-  static_assert(
-    DerivedF::ColsAtCompileTime == 3 || DerivedF::ColsAtCompileTime == Eigen::Dynamic,
-    "F should have 3 or Dynamic columns");
-  igl::WindingNumberTree<Scalar,Index>::set_mesh(V,F);
+  igl::WindingNumberTree<Point,DerivedV,DerivedF>::set_mesh(V,F);
   init();
 }
 
-template <typename Scalar, typename Index>
-inline void igl::WindingNumberAABB<Scalar,Index>::init()
+template <typename Point, typename DerivedV, typename DerivedF>
+inline void igl::WindingNumberAABB<Point,DerivedV,DerivedF>::init()
 {
   using namespace Eigen;
   assert(max_corner.size() == 3);
   assert(min_corner.size() == 3);
   compute_min_max_corners();
-  Eigen::Matrix<Scalar,Eigen::Dynamic,1> dblA;
-  doublearea((*this->Vptr),(this->F),dblA);
+  Eigen::Matrix<typename DerivedV::Scalar,Eigen::Dynamic,1> dblA;
+  doublearea(this->getV(),this->getF(),dblA);
   total_positive_area = dblA.sum()/2.0;
 }
 
-template <typename Scalar, typename Index>
-template <typename DerivedV, typename DerivedF>
-inline igl::WindingNumberAABB<Scalar,Index>::WindingNumberAABB(
+template <typename Point, typename DerivedV, typename DerivedF>
+inline igl::WindingNumberAABB<Point,DerivedV,DerivedF>::WindingNumberAABB(
   const Eigen::MatrixBase<DerivedV> & V,
   const Eigen::MatrixBase<DerivedF> & F):
-  WindingNumberTree<Scalar,Index>(V,F),
+  WindingNumberTree<Point,DerivedV,DerivedF>(V,F),
   min_corner(),
   max_corner(),
   total_positive_area(
-    std::numeric_limits<Scalar>::infinity()),
+    std::numeric_limits<typename DerivedV::Scalar>::infinity()),
   split_method(MEDIAN_ON_LONGEST_AXIS)
 {
   init();
 }
 
-template <typename Scalar, typename Index>
-inline igl::WindingNumberAABB<Scalar,Index>::WindingNumberAABB(
-  const WindingNumberTree<Scalar,Index> & parent,
-  const typename WindingNumberTree<Scalar,Index>::MatrixXF & F):
-  WindingNumberTree<Scalar,Index>(parent,F),
+template <typename Point, typename DerivedV, typename DerivedF>
+inline igl::WindingNumberAABB<Point,DerivedV,DerivedF>::WindingNumberAABB(
+  const WindingNumberTree<Point,DerivedV,DerivedF> & parent,
+  const Eigen::MatrixBase<DerivedF> & F):
+  WindingNumberTree<Point,DerivedV,DerivedF>(parent,F),
   min_corner(),
   max_corner(),
   total_positive_area(
-    std::numeric_limits<Scalar>::infinity()),
+    std::numeric_limits<typename DerivedV::Scalar>::infinity()),
   split_method(MEDIAN_ON_LONGEST_AXIS)
 {
   init();
 }
 
-template <typename Scalar, typename Index>
-inline void igl::WindingNumberAABB<Scalar,Index>::grow()
+template <typename Point, typename DerivedV, typename DerivedF>
+inline void igl::WindingNumberAABB<Point,DerivedV,DerivedF>::grow()
 {
   using namespace std;
   using namespace Eigen;
   // Clear anything that already exists
   this->delete_children();
 
-  //cout<<"cap.rows(): "<<(this->cap).rows()<<endl;
-  //cout<<"F.rows(): "<<(this->F).rows()<<endl;
+  //cout<<"cap.rows(): "<<this->getcap().rows()<<endl;
+  //cout<<"F.rows(): "<<this->getF().rows()<<endl;
 
   // Base cases
   if(
-    (this->F).rows() <= (WindingNumberAABB_MIN_F>0?WindingNumberAABB_MIN_F:0) ||
-    ((this->cap).rows() - 2) >= (this->F).rows())
+    this->getF().rows() <= (WindingNumberAABB_MIN_F>0?WindingNumberAABB_MIN_F:0) ||
+    (this->getcap().rows() - 2) >= this->getF().rows())
   {
     // Don't grow
     return;
@@ -168,8 +157,8 @@ inline void igl::WindingNumberAABB<Scalar,Index>::grow()
 
   // Compute longest direction
   int max_d = -1;
-  Scalar max_len = 
-    -numeric_limits<Scalar>::infinity();
+  typename DerivedV::Scalar max_len = 
+    -numeric_limits<typename DerivedV::Scalar>::infinity();
   for(int d = 0;d<min_corner.size();d++)
   {
     if( (max_corner[d] - min_corner[d]) > max_len )
@@ -179,13 +168,13 @@ inline void igl::WindingNumberAABB<Scalar,Index>::grow()
     }
   }
   // Compute facet barycenters
-  Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic> BC;
-  barycenter((*this->Vptr),(this->F),BC);
+  Eigen::Matrix<typename DerivedV::Scalar,Eigen::Dynamic,Eigen::Dynamic> BC;
+  barycenter(this->getV(),this->getF(),BC);
 
 
   // Blerg, why is selecting rows so difficult
 
-  Scalar split_value;
+  typename DerivedV::Scalar split_value;
   // Split in longest direction
   switch(split_method)
   {
@@ -202,8 +191,8 @@ inline void igl::WindingNumberAABB<Scalar,Index>::grow()
   //cout<<"c: "<<0.5*(max_corner[max_d] + min_corner[max_d])<<" "<<
   //  "m: "<<split_value<<endl;;
 
-  vector<int> id( (this->F).rows());
-  for(int i = 0;i<(this->F).rows();i++)
+  vector<int> id( this->getF().rows());
+  for(int i = 0;i<this->getF().rows();i++)
   {
     if(BC(i,max_d) <= split_value)
     {
@@ -221,19 +210,19 @@ inline void igl::WindingNumberAABB<Scalar,Index>::grow()
     // badly balanced base case (could try to recut)
     return;
   }
-  assert(lefts+rights == (this->F).rows());
-  MatrixXF leftF(lefts,  (this->F).cols());
-  MatrixXF rightF(rights,(this->F).cols());
+  assert(lefts+rights == this->getF().rows());
+  DerivedF leftF(lefts,  this->getF().cols());
+  DerivedF rightF(rights,this->getF().cols());
   int left_i = 0;
   int right_i = 0;
-  for(int i = 0;i<(this->F).rows();i++)
+  for(int i = 0;i<this->getF().rows();i++)
   {
     if(id[i] == 0)
     {
-      leftF.row(left_i++) = (this->F).row(i);
+      leftF.row(left_i++) = this->getF().row(i);
     }else if(id[i] == 1)
     {
-      rightF.row(right_i++) = (this->F).row(i);
+      rightF.row(right_i++) = this->getF().row(i);
     }else
     {
       assert(false);
@@ -242,18 +231,18 @@ inline void igl::WindingNumberAABB<Scalar,Index>::grow()
   assert(right_i == rightF.rows());
   assert(left_i == leftF.rows());
   // Finally actually grow children and Recursively grow
-  WindingNumberAABB<Scalar,Index> * leftWindingNumberAABB = 
-    new WindingNumberAABB<Scalar,Index>(*this,leftF);
+  WindingNumberAABB<Point,DerivedV,DerivedF> * leftWindingNumberAABB = 
+    new WindingNumberAABB<Point,DerivedV,DerivedF>(*this,leftF);
   leftWindingNumberAABB->grow();
   this->children.push_back(leftWindingNumberAABB);
-  WindingNumberAABB<Scalar,Index> * rightWindingNumberAABB = 
-    new WindingNumberAABB<Scalar,Index>(*this,rightF);
+  WindingNumberAABB<Point,DerivedV,DerivedF> * rightWindingNumberAABB = 
+    new WindingNumberAABB<Point,DerivedV,DerivedF>(*this,rightF);
   rightWindingNumberAABB->grow();
   this->children.push_back(rightWindingNumberAABB);
 }
 
-template <typename Scalar, typename Index>
-inline bool igl::WindingNumberAABB<Scalar,Index>::inside(const Point & p) const
+template <typename Point, typename DerivedV, typename DerivedF>
+inline bool igl::WindingNumberAABB<Point,DerivedV,DerivedF>::inside(const Point & p) const
 {
   assert(p.size() == max_corner.size());
   assert(p.size() == min_corner.size());
@@ -270,8 +259,8 @@ inline bool igl::WindingNumberAABB<Scalar,Index>::inside(const Point & p) const
   return true;
 }
 
-template <typename Scalar, typename Index>
-inline void igl::WindingNumberAABB<Scalar,Index>::compute_min_max_corners()
+template <typename Point, typename DerivedV, typename DerivedF>
+inline void igl::WindingNumberAABB<Point,DerivedV,DerivedF>::compute_min_max_corners()
 {
   using namespace std;
   // initialize corners
@@ -283,26 +272,26 @@ inline void igl::WindingNumberAABB<Scalar,Index>::compute_min_max_corners()
 
   this->center = Point(0,0,0);
   // Loop over facets
-  for(int i = 0;i<(this->F).rows();i++)
+  for(int i = 0;i<this->getF().rows();i++)
   {
-    for(int j = 0;j<(this->F).cols();j++)
+    for(int j = 0;j<this->getF().cols();j++)
     {
       for(int d = 0;d<min_corner.size();d++)
       {
         min_corner[d] = 
-          (*this->Vptr)((this->F)(i,j),d) < min_corner[d] ?  
-            (*this->Vptr)((this->F)(i,j),d) : min_corner[d];
+          this->getV()(this->getF()(i,j),d) < min_corner[d] ?  
+            this->getV()(this->getF()(i,j),d) : min_corner[d];
         max_corner[d] = 
-          (*this->Vptr)((this->F)(i,j),d) > max_corner[d] ?  
-            (*this->Vptr)((this->F)(i,j),d) : max_corner[d];
+          this->getV()(this->getF()(i,j),d) > max_corner[d] ?  
+            this->getV()(this->getF()(i,j),d) : max_corner[d];
       }
       // This is biased toward vertices incident on more than one face, but
       // perhaps that's good
-      this->center += (*this->Vptr).row((this->F)(i,j));
+      this->center += this->getV().row(this->getF()(i,j));
     }
   }
   // Average
-  this->center.array() /= (this->F).size();
+  this->center.array() /= this->getF().size();
 
   //cout<<"min_corner: "<<this->min_corner.transpose()<<endl;
   //cout<<"Center: "<<this->center.transpose()<<endl;
@@ -313,24 +302,24 @@ inline void igl::WindingNumberAABB<Scalar,Index>::compute_min_max_corners()
   this->radius = (max_corner-min_corner).norm()/2.0;
 }
 
-template <typename Scalar, typename Index>
-inline Scalar
-igl::WindingNumberAABB<Scalar,Index>::max_abs_winding_number(const Point & p) const
+template <typename Point, typename DerivedV, typename DerivedF>
+inline typename DerivedV::Scalar
+igl::WindingNumberAABB<Point,DerivedV,DerivedF>::max_abs_winding_number(const Point & p) const
 {
   using namespace std;
   // Only valid if not inside
   if(inside(p))
   {
-    return numeric_limits<Scalar>::infinity();
+    return numeric_limits<typename DerivedV::Scalar>::infinity();
   }
   // Q: we know the total positive area so what's the most this could project
   // to? Remember it could be layered in the same direction.
-  return numeric_limits<Scalar>::infinity();
+  return numeric_limits<typename DerivedV::Scalar>::infinity();
 }
 
-template <typename Scalar, typename Index>
-inline Scalar 
-  igl::WindingNumberAABB<Scalar,Index>::max_simple_abs_winding_number(
+template <typename Point, typename DerivedV, typename DerivedF>
+inline typename DerivedV::Scalar 
+  igl::WindingNumberAABB<Point,DerivedV,DerivedF>::max_simple_abs_winding_number(
   const Point & p) const
 {
   using namespace std;
@@ -338,7 +327,7 @@ inline Scalar
   // Only valid if not inside
   if(inside(p))
   {
-    return numeric_limits<Scalar>::infinity();
+    return numeric_limits<typename DerivedV::Scalar>::infinity();
   }
   // Max simple is the same as sum of positive winding number contributions of
   // bounding box
@@ -346,10 +335,10 @@ inline Scalar
   // begin precomputation
   //MatrixXd BV((int)pow(2,3),3);
   typedef
-    Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic>
+    Eigen::Matrix<typename DerivedV::Scalar,Eigen::Dynamic,Eigen::Dynamic>
     MatrixXS;
   typedef
-    Eigen::Matrix<Index,Eigen::Dynamic,Eigen::Dynamic>
+    Eigen::Matrix<typename DerivedF::Scalar,Eigen::Dynamic,Eigen::Dynamic>
     MatrixXF;
   MatrixXS BV((int)(1<<3),3);
   BV <<
@@ -392,6 +381,18 @@ inline Scalar
   }
   PBF.conservativeResize(pbfi,PBF.cols());
   return igl::winding_number(BV,PBF,p);
+}
+
+// This is a bullshit template because AABB annoyingly needs templates for bad
+// combinations of 3D V with DIM=2 AABB
+//
+// _Define_ as a no-op rather than monkeying around with the proper code above
+namespace igl
+{
+  template <> inline igl::WindingNumberAABB<Eigen::Matrix<double, 1, 3, 1, 1, 3>,Eigen::Matrix<double, -1, 2, 0, -1, 2>,Eigen::Matrix<int, -1, 2, 0, -1, 2>>::WindingNumberAABB(const Eigen::MatrixBase<Eigen::Matrix<double, -1, 2, 0, -1, 2>> & , const Eigen::MatrixBase<Eigen::Matrix<int, -1, 2, 0, -1, 2>> & ){};
+  template <> inline void igl::WindingNumberAABB<Eigen::Matrix<double, 1, 3, 1, 1, 3>,Eigen::Matrix<double, -1, 2, 0, -1, 2>,Eigen::Matrix<int, -1, 2, 0, -1, 2>>::grow(){};
+  template <> inline void igl::WindingNumberAABB<Eigen::Matrix<double, 1, 3, 1, 1, 3>,Eigen::Matrix<double, -1, 2, 0, -1, 2>,Eigen::Matrix<int, -1, 2, 0, -1, 2>>::init(){};
+
 }
 
 #endif

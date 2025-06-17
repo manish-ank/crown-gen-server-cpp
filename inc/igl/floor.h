@@ -17,7 +17,7 @@ namespace igl
   /// @param[out] Y  m by n matrix of floored integers
   template < typename DerivedX, typename DerivedY>
   IGL_INLINE void floor(
-    const Eigen::DenseBase<DerivedX>& X,
+    const Eigen::PlainObjectBase<DerivedX>& X,
     Eigen::PlainObjectBase<DerivedY>& Y);
 }
 

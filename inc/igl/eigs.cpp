@@ -10,7 +10,6 @@
 #include "cotmatrix.h"
 #include "sort.h"
 #include "massmatrix.h"
-#include "placeholders.h"
 #include <iostream>
 
 template <
@@ -110,14 +109,10 @@ IGL_INLINE bool igl::eigs(
             case Eigen::Success:
               break;
             case Eigen::NumericalIssue:
-#ifdef IGL_EIGS_DEBUG
               cerr<<"Error: Numerical issue."<<endl;
-#endif
               return false;
             default:
-#ifdef IGL_EIGS_DEBUG
               cerr<<"Error: Other."<<endl;
-#endif
               return false;
           }
           const VectorXS rhs = B*x;
@@ -164,7 +159,7 @@ IGL_INLINE bool igl::eigs(
   // finally sort
   VectorXi I;
   igl::sort(S,1,false,sS,I);
-  sU = U(igl::placeholders::all,I);
+  sU = U(Eigen::all,I);
   sS /= rescale;
   sU /= sqrt(rescale);
   return true;
